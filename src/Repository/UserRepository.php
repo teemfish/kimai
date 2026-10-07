@@ -421,15 +421,13 @@ class UserRepository extends EntityRepository implements UserLoaderInterface, Us
 
         try {
             if (null !== $replace) {
-                $qb = $em->createQueryBuilder();
-                $qb
-                    ->update(Timesheet::class, 't')
-                    ->set('t.user', ':replace')
-                    ->where('t.user = :delete')
-                    ->setParameter('delete', $delete->getId())
-                    ->setParameter('replace', $replace->getId())
-                    ->getQuery()
-                    ->execute();
+                $connection = $em->getConnection();
+                $userColumn = $connection->quoteIdentifier($em->getClassMetadata(Timesheet::class)->getSingleAssociationJoinColumnName('user'));
+                $connection->executeStatement(
+                    'UPDATE kimai2_timesheet SET ' . $userColumn . ' = ? WHERE ' . $userColumn . ' = ?',
+                    [$replace->getId(), $delete->getId()],
+                    [Types::INTEGER, Types::INTEGER]
+                );
 
                 $qb = $em->createQueryBuilder();
                 $qb

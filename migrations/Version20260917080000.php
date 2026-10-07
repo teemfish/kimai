@@ -30,7 +30,7 @@ final class Version20260917080000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $languages = $this->connection->fetchFirstColumn("SELECT DISTINCT `value` FROM kimai2_user_preferences WHERE `name` = 'language'");
+        $languages = $this->connection->fetchFirstColumn("SELECT DISTINCT value FROM kimai2_user_preferences WHERE name = 'language'");
 
         $changed = false;
         foreach ($languages as $language) {
@@ -38,7 +38,7 @@ final class Version20260917080000 extends AbstractMigration
                 continue;
             }
 
-            $this->addSql("UPDATE kimai2_user_preferences SET `value` = :new WHERE `name` = 'language' AND `value` = :old", [
+            $this->addSql("UPDATE kimai2_user_preferences SET value = :new WHERE name = 'language' AND value = :old", [
                 'new' => self::getNearestTranslationLocale($language),
                 'old' => $language,
             ]);

@@ -24,9 +24,9 @@ final class Version20240926111739 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE kimai2_activities ADD created_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('ALTER TABLE kimai2_customers ADD created_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('ALTER TABLE kimai2_projects ADD created_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\'');
+        $schema->getTable('kimai2_activities')->addColumn('created_at', 'datetime_immutable', ['notnull' => false]);
+        $schema->getTable('kimai2_customers')->addColumn('created_at', 'datetime_immutable', ['notnull' => false]);
+        $schema->getTable('kimai2_projects')->addColumn('created_at', 'datetime_immutable', ['notnull' => false]);
         $this->addSql('ALTER TABLE kimai2_timesheet ADD break INT DEFAULT NULL');
     }
 

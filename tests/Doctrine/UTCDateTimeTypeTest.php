@@ -12,6 +12,7 @@ namespace App\Tests\Doctrine;
 use App\Doctrine\UTCDateTimeType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
@@ -90,12 +91,13 @@ class UTCDateTimeTypeTest extends TestCase
     }
 
     /**
-     * @return MySQLPlatform[][]
+     * @return AbstractPlatform[][]
      */
     public static function getPlatforms(): array
     {
         return [
             [new MySQLPlatform()],
+            [new PostgreSQLPlatform()],
         ];
     }
 }

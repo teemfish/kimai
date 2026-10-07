@@ -9,6 +9,7 @@
 
 namespace App\Entity;
 
+use App\Doctrine\CaseInsensitiveStringType;
 use App\Export\Annotation as Exporter;
 use App\Repository\UserRepository;
 use App\Utils\StringHelper;
@@ -163,7 +164,7 @@ class User implements UserInterface, EquatableInterface, ThemeUserInterface, Pas
      * @internal has no database mapping as the value is calculated from a permission
      */
     private ?bool $isAllowedToSeeAllData = null;
-    #[ORM\Column(name: 'username', type: Types::STRING, length: 180, nullable: false)]
+    #[ORM\Column(name: 'username', type: CaseInsensitiveStringType::NAME, length: 180, nullable: false)]
     #[Assert\NotBlank(groups: ['Registration', 'UserCreate', 'Profile'])]
     #[Assert\Regex(pattern: '/\//', match: false, groups: ['Registration', 'UserCreate', 'Profile'])]
     #[Assert\Length(min: 2, max: 64, groups: ['Registration', 'UserCreate', 'Profile'])]
@@ -171,7 +172,7 @@ class User implements UserInterface, EquatableInterface, ThemeUserInterface, Pas
     #[Serializer\Expose]
     #[Serializer\Groups(['Default'])]
     private ?string $username = null;
-    #[ORM\Column(name: 'email', type: Types::STRING, length: 180, nullable: false)]
+    #[ORM\Column(name: 'email', type: CaseInsensitiveStringType::NAME, length: 180, nullable: false)]
     #[Assert\NotBlank(groups: ['Registration', 'UserCreate', 'Profile'])]
     #[Assert\Length(min: 2, max: 180)]
     #[Assert\Email(mode: 'html5', groups: ['Registration', 'UserCreate', 'Profile'])]

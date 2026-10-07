@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace DoctrineMigrations;
 
 use App\Doctrine\AbstractMigration;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 
 /**
@@ -36,7 +37,15 @@ final class Version20210605154245 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE kimai2_users ADD username_canonical VARCHAR(180) CHARACTER SET utf8mb4 NOT NULL COLLATE `utf8mb4_unicode_ci`, ADD email_canonical VARCHAR(180) CHARACTER SET utf8mb4 NOT NULL COLLATE `utf8mb4_unicode_ci`, ADD salt VARCHAR(255) CHARACTER SET utf8mb4 DEFAULT NULL COLLATE `utf8mb4_unicode_ci`');
+        if ($this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+            $this->addSql('ALTER TABLE kimai2_users ADD username_canonical VARCHAR(180) DEFAULT NULL, ADD email_canonical VARCHAR(180) DEFAULT NULL, ADD salt VARCHAR(255) DEFAULT NULL');
+        } else {
+            $this->addSql('ALTER TABLE kimai2_users ADD username_canonical VARCHAR(180) CHARACTER SET utf8mb4 NOT NULL COLLATE `utf8mb4_unicode_ci`, ADD email_canonical VARCHAR(180) CHARACTER SET utf8mb4 NOT NULL COLLATE `utf8mb4_unicode_ci`, ADD salt VARCHAR(255) CHARACTER SET utf8mb4 DEFAULT NULL COLLATE `utf8mb4_unicode_ci`');
+        }
+        $this->addSql('UPDATE kimai2_users SET username_canonical = username, email_canonical = email');
+        if ($this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+            $this->addSql('ALTER TABLE kimai2_users ALTER COLUMN username_canonical SET NOT NULL, ALTER COLUMN email_canonical SET NOT NULL');
+        }
         $this->addSql('CREATE UNIQUE INDEX UNIQ_B9AC5BCE92FC23A8 ON kimai2_users (username_canonical)');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_B9AC5BCEA0D96FBF ON kimai2_users (email_canonical)');
     }

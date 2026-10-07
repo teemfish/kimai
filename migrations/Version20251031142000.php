@@ -10,6 +10,7 @@
 namespace DoctrineMigrations;
 
 use App\Doctrine\AbstractMigration;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 
 /**
@@ -26,15 +27,27 @@ final class Version20251031142000 extends AbstractMigration
     {
         $this->addSql('ALTER TABLE kimai2_customers ADD address_line1 VARCHAR(150) DEFAULT NULL, ADD address_line2 VARCHAR(150) DEFAULT NULL, ADD address_line3 VARCHAR(150) DEFAULT NULL, ADD postcode VARCHAR(20) DEFAULT NULL, ADD city VARCHAR(50) DEFAULT NULL, ADD buyer_reference VARCHAR(50) DEFAULT NULL');
         $this->addSql('ALTER TABLE kimai2_invoice_templates ADD customer_id INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE kimai2_invoice_templates MODIFY company VARCHAR(255) NULL');
+        if ($this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+            $this->addSql('ALTER TABLE kimai2_invoice_templates ALTER COLUMN company TYPE VARCHAR(255) USING company::VARCHAR(255), ALTER COLUMN company DROP NOT NULL, ALTER COLUMN company DROP DEFAULT');
+        } else {
+            $this->addSql('ALTER TABLE kimai2_invoice_templates MODIFY company VARCHAR(255) NULL');
+        }
         $this->addSql('ALTER TABLE kimai2_invoice_templates ADD CONSTRAINT FK_1626CFE99395C3F3 FOREIGN KEY (customer_id) REFERENCES kimai2_customers (id) ON DELETE SET NULL');
         $this->addSql('CREATE INDEX IDX_1626CFE99395C3F3 ON kimai2_invoice_templates (customer_id)');
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE kimai2_invoice_templates DROP FOREIGN KEY FK_1626CFE99395C3F3');
-        $this->addSql('DROP INDEX IDX_1626CFE99395C3F3 ON kimai2_invoice_templates');
+        if ($this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+            $this->addSql('ALTER TABLE kimai2_invoice_templates DROP CONSTRAINT FK_1626CFE99395C3F3');
+        } else {
+            $this->addSql('ALTER TABLE kimai2_invoice_templates DROP FOREIGN KEY FK_1626CFE99395C3F3');
+        }
+        if ($this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+            $this->addSql('DROP INDEX IDX_1626CFE99395C3F3');
+        } else {
+            $this->addSql('DROP INDEX IDX_1626CFE99395C3F3 ON kimai2_invoice_templates');
+        }
         $this->addSql('ALTER TABLE kimai2_invoice_templates DROP customer_id');
         $this->addSql('ALTER TABLE kimai2_customers DROP address_line1, DROP address_line2, DROP address_line3, DROP postcode, DROP city, DROP buyer_reference');
     }

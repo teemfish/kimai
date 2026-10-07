@@ -31,8 +31,35 @@ and so much more.
 
 - PHP 8.2 minimum with support for 8.3, 8.4, 8.5
 - MariaDB / MySQL: oldest maintained LTS release (MariaDB >= [10.6](https://endoflife.date/mariadb) or MySQL >= [8.4](https://endoflife.date/mysql)) or newer
+- PostgreSQL 16 or newer is also supported in this checkout (requires `pdo_pgsql`).
 - A webserver and subdomain (subdirectory is not supported)
 - PHP extensions: `gd`, `intl`, `json`, `mbstring`, `pdo`, `tokenizer`, `xml`, `xsl`, `zip`
+
+## PostgreSQL
+
+Install the PHP `pdo_pgsql` extension and set `DATABASE_URL` in `.env.local`:
+
+```dotenv
+DATABASE_URL=postgresql://user:password@127.0.0.1:5432/kimai?charset=utf8&serverVersion=16
+```
+
+Replace the credentials, host, database name, and `serverVersion` with your database settings.
+URL-encode special characters in the credentials. The database user needs permission to create
+and alter tables, indexes, and sequences. To let the installer create the database, grant
+`CREATEDB`; otherwise, create the database first and make the application user its owner.
+The installer enables the PostgreSQL `citext` extension for case-insensitive usernames and
+email addresses. Grant `CREATE` on the database or have an administrator install `citext` first.
+
+Run the installer:
+
+```sh
+bin/console kimai:install --no-interaction
+bin/console doctrine:schema:validate
+```
+
+The Docker images built from this checkout include `pdo_pgsql`. Use the same connection URL
+with your PostgreSQL service hostname. Plugins need their own PostgreSQL compatibility checks.
+Changing `DATABASE_URL` does not transfer data from an existing MySQL or MariaDB database.
 
 ## Installation
 
@@ -93,4 +120,3 @@ Kimai is based on modern technologies and frameworks such as [PHP](https://www.p
 [Symfony](https://github.com/symfony/symfony) and [Doctrine](https://github.com/doctrine/),
 [Bootstrap](https://github.com/twbs/bootstrap) and [Tabler](https://tabler.io/),
 and [countless](composer.json) [others](package.json).
-

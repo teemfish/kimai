@@ -32,7 +32,7 @@ final class Version20220315224645 extends AbstractMigration
         $activities = $schema->getTable('kimai2_activities');
         $activities->addColumn('billable', 'boolean', ['notnull' => true, 'default' => true]);
 
-        $this->addSql('DELETE from kimai2_configuration WHERE `name` = "defaults.timesheet.billable"');
+        $this->addSql('DELETE from kimai2_configuration WHERE name = \'defaults.timesheet.billable\'');
     }
 
     public function down(Schema $schema): void

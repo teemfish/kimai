@@ -86,8 +86,8 @@ class ProjectStatisticService
         $qb
             ->select('p')
             ->leftJoin('p.customer', 'c')
-            ->andWhere($qb->expr()->eq('p.visible', true))
-            ->andWhere($qb->expr()->eq('c.visible', true))
+            ->andWhere($qb->expr()->eq('p.visible', 'true'))
+            ->andWhere($qb->expr()->eq('c.visible', 'true'))
             ->andWhere($qb->expr()->not($qb->expr()->exists($qb2)))
             ->andWhere(
                 $qb->expr()->orX(
@@ -129,8 +129,8 @@ class ProjectStatisticService
         $qb
             ->select('p')
             ->leftJoin('p.customer', 'c')
-            ->andWhere($qb->expr()->eq('p.visible', true))
-            ->andWhere($qb->expr()->eq('c.visible', true))
+            ->andWhere($qb->expr()->eq('p.visible', 'true'))
+            ->andWhere($qb->expr()->eq('c.visible', 'true'))
             ->andWhere(
                 $qb->expr()->andX(
                     $qb->expr()->orX(
@@ -637,8 +637,8 @@ class ProjectStatisticService
         $qb
             ->select('p')
             ->leftJoin('p.customer', 'c')
-            ->andWhere($qb->expr()->eq('p.visible', true))
-            ->andWhere($qb->expr()->eq('c.visible', true))
+            ->andWhere($qb->expr()->eq('p.visible', 'true'))
+            ->andWhere($qb->expr()->eq('c.visible', 'true'))
             ->andWhere(
                 $qb->expr()->orX(
                     $qb->expr()->isNull('p.end'),

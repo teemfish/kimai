@@ -27,7 +27,7 @@ final class Version20240920105524 extends AbstractMigration
         $ids = $this->connection->fetchFirstColumn("
 SELECT DISTINCT user_id
 FROM kimai2_user_preferences AS kp
-WHERE kp.value > 0
+WHERE CAST(CASE WHEN kp.name IN ('work_monday', 'work_tuesday', 'work_wednesday', 'work_thursday', 'work_friday', 'work_saturday', 'work_sunday') THEN kp.value ELSE '0' END AS DECIMAL(10, 2)) > 0
   AND kp.name IN ('work_monday', 'work_tuesday', 'work_wednesday', 'work_thursday', 'work_friday', 'work_saturday', 'work_sunday')
   AND NOT EXISTS (
     SELECT 1
@@ -37,7 +37,7 @@ WHERE kp.value > 0
 );");
 
         foreach ($ids as $id) {
-            $this->addSql('INSERT INTO kimai2_user_preferences (`user_id`, `name`, `value`) VALUES (:id, :name, :value)', [
+            $this->addSql('INSERT INTO kimai2_user_preferences (user_id, name, value) VALUES (:id, :name, :value)', [
                 'id' => $id,
                 'name' => 'work_contract_type',
                 'value' => 'day',
@@ -51,7 +51,7 @@ WHERE kp.value > 0
 
     public function down(Schema $schema): void
     {
-        $this->addSql("DELETE FROM kimai2_user_preferences WHERE `name` = 'work_contract_type'");
+        $this->addSql("DELETE FROM kimai2_user_preferences WHERE name = 'work_contract_type'");
     }
 
     public function isTransactional(): bool

@@ -22,6 +22,7 @@ use App\Repository\Query\TimesheetQuery;
 use App\Repository\UserRepository;
 use App\Timesheet\DateTimeFactory;
 use App\Utils\SearchTerm;
+use Doctrine\DBAL\Types\ConversionException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -214,7 +215,11 @@ final class InvoiceCreateCommand extends Command
 
             $customersIDs = explode(',', $customersIDs);
             foreach ($customersIDs as $id) {
-                $tmp = $this->customerRepository->find($id);
+                try {
+                    $tmp = $this->customerRepository->find($id);
+                } catch (ConversionException) {
+                    $tmp = null;
+                }
                 if (null === $tmp) {
                     $io->error('Unknown customer ID: ' . $id);
 
@@ -229,7 +234,11 @@ final class InvoiceCreateCommand extends Command
 
             $projectIDs = explode(',', $projectIDs);
             foreach ($projectIDs as $id) {
-                $tmp = $this->projectRepository->find($id);
+                try {
+                    $tmp = $this->projectRepository->find($id);
+                } catch (ConversionException) {
+                    $tmp = null;
+                }
                 if (null === $tmp) {
                     $io->error('Unknown project ID: ' . $id);
 
@@ -442,7 +451,11 @@ final class InvoiceCreateCommand extends Command
             return $customer->getInvoiceTemplate();
         }
 
-        $tpl = $this->invoiceTemplateRepository->find($template);
+        try {
+            $tpl = (\is_int($template) || (\is_string($template) && ctype_digit($template))) ? $this->invoiceTemplateRepository->find($template) : null;
+        } catch (ConversionException) {
+            $tpl = null;
+        }
 
         if (null !== $tpl) {
             return $tpl;

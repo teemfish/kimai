@@ -74,21 +74,21 @@ final class Version20230126002049 extends AbstractMigration
             $timesheet->addIndex(['user', 'id', 'duration'], 'IDX_TIMESHEET_RESULT_STATS');
         }
 
-        $this->addSql("UPDATE kimai2_invoice_templates SET `language` = 'en' WHERE `language` IS NULL");
-        $this->addSql("UPDATE kimai2_user_preferences SET `name` = 'timesheet_daily_stats' WHERE `name` = 'timesheet.daily_stats'");
-        $this->addSql("UPDATE kimai2_user_preferences SET `name` = 'collapsed_sidebar' WHERE `name` = 'theme.collapsed_sidebar'");
-        $this->addSql("UPDATE kimai2_user_preferences SET `name` = 'layout' WHERE `name` = 'theme.layout'");
-        $this->addSql("UPDATE kimai2_user_preferences SET `name` = 'login_initial_view' WHERE `name` = 'login.initial_view'");
-        $this->addSql("UPDATE kimai2_user_preferences SET `name` = 'calendar_initial_view' WHERE `name` = 'calendar.initial_view'");
-        $this->addSql("UPDATE kimai2_user_preferences SET `name` = 'export_decimal' WHERE `name` = 'timesheet.export_decimal'");
-        $this->addSql("UPDATE kimai2_user_preferences SET `name` = 'update_browser_title' WHERE `name` = 'theme.update_browser_title'");
-        $this->addSql("UPDATE kimai2_configuration SET `value` = '15' WHERE `name` = 'timesheet.time_increment' and `value` = '0'");
-        $this->addSql("UPDATE kimai2_configuration SET `value` = '5' WHERE `name` = 'timesheet.time_increment' and `value` IN ('1', '2', '3', '4')");
-        $this->addSql("UPDATE kimai2_configuration SET `value` = '0' WHERE `name` = 'user.registration'");
-        $this->addSql('UPDATE kimai2_roles SET `name` = UPPER(`name`)');
-        $this->addSql("UPDATE kimai2_invoice_templates SET `renderer` = 'service-date' WHERE `renderer` = 'freelancer'");
-        $this->addSql("UPDATE kimai2_invoice_templates SET `renderer` = 'invoice' WHERE `renderer` = 'default'");
-        $this->addSql("UPDATE kimai2_invoice_templates SET `renderer` = 'default' WHERE `renderer` = 'default-pdf'");
+        $this->addSql("UPDATE kimai2_invoice_templates SET language = 'en' WHERE language IS NULL");
+        $this->addSql("UPDATE kimai2_user_preferences SET name = 'timesheet_daily_stats' WHERE name = 'timesheet.daily_stats'");
+        $this->addSql("UPDATE kimai2_user_preferences SET name = 'collapsed_sidebar' WHERE name = 'theme.collapsed_sidebar'");
+        $this->addSql("UPDATE kimai2_user_preferences SET name = 'layout' WHERE name = 'theme.layout'");
+        $this->addSql("UPDATE kimai2_user_preferences SET name = 'login_initial_view' WHERE name = 'login.initial_view'");
+        $this->addSql("UPDATE kimai2_user_preferences SET name = 'calendar_initial_view' WHERE name = 'calendar.initial_view'");
+        $this->addSql("UPDATE kimai2_user_preferences SET name = 'export_decimal' WHERE name = 'timesheet.export_decimal'");
+        $this->addSql("UPDATE kimai2_user_preferences SET name = 'update_browser_title' WHERE name = 'theme.update_browser_title'");
+        $this->addSql("UPDATE kimai2_configuration SET value = '15' WHERE name = 'timesheet.time_increment' and value = '0'");
+        $this->addSql("UPDATE kimai2_configuration SET value = '5' WHERE name = 'timesheet.time_increment' and value IN ('1', '2', '3', '4')");
+        $this->addSql("UPDATE kimai2_configuration SET value = '0' WHERE name = 'user.registration'");
+        $this->addSql('UPDATE kimai2_roles SET name = UPPER(name)');
+        $this->addSql("UPDATE kimai2_invoice_templates SET renderer = 'service-date' WHERE renderer = 'freelancer'");
+        $this->addSql("UPDATE kimai2_invoice_templates SET renderer = 'invoice' WHERE renderer = 'default'");
+        $this->addSql("UPDATE kimai2_invoice_templates SET renderer = 'default' WHERE renderer = 'default-pdf'");
     }
 
     public function down(Schema $schema): void
@@ -120,12 +120,12 @@ final class Version20230126002049 extends AbstractMigration
             $timesheet->dropIndex('IDX_TIMESHEET_RESULT_STATS');
         }
 
-        $this->addSql("UPDATE kimai2_user_preferences SET `name` = 'theme.collapsed_sidebar' WHERE `name` = 'collapsed_sidebar'");
-        $this->addSql("UPDATE kimai2_user_preferences SET `name` = 'theme.layout' WHERE `name` = 'layout'");
-        $this->addSql("UPDATE kimai2_user_preferences SET `name` = 'calendar.initial_view' WHERE `name` = 'calendar_initial_view'");
-        $this->addSql("UPDATE kimai2_user_preferences SET `name` = 'login.initial_view' WHERE `name` = 'login_initial_view'");
-        $this->addSql("UPDATE kimai2_user_preferences SET `name` = 'timesheet.daily_stats' WHERE `name` = 'timesheet_daily_stats'");
-        $this->addSql("UPDATE kimai2_user_preferences SET `name` = 'timesheet.export_decimal' WHERE `name` = 'export_decimal'");
-        $this->addSql("UPDATE kimai2_user_preferences SET `name` = 'theme.update_browser_title' WHERE `name` = 'update_browser_title'");
+        $this->addSql("UPDATE kimai2_user_preferences SET name = 'theme.collapsed_sidebar' WHERE name = 'collapsed_sidebar'");
+        $this->addSql("UPDATE kimai2_user_preferences SET name = 'theme.layout' WHERE name = 'layout'");
+        $this->addSql("UPDATE kimai2_user_preferences SET name = 'calendar.initial_view' WHERE name = 'calendar_initial_view'");
+        $this->addSql("UPDATE kimai2_user_preferences SET name = 'login.initial_view' WHERE name = 'login_initial_view'");
+        $this->addSql("UPDATE kimai2_user_preferences SET name = 'timesheet.daily_stats' WHERE name = 'timesheet_daily_stats'");
+        $this->addSql("UPDATE kimai2_user_preferences SET name = 'timesheet.export_decimal' WHERE name = 'export_decimal'");
+        $this->addSql("UPDATE kimai2_user_preferences SET name = 'theme.update_browser_title' WHERE name = 'update_browser_title'");
     }
 }

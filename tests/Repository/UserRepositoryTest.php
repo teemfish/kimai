@@ -13,15 +13,66 @@ use App\Entity\User;
 use App\Event\UserInteractiveLoginEvent;
 use App\EventSubscriber\LastLoginSubscriber;
 use App\Repository\UserRepository;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Types\Types;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[CoversClass(UserRepository::class)]
 #[CoversClass(LastLoginSubscriber::class)]
 #[Group('integration')]
 class UserRepositoryTest extends AbstractRepositoryTestCase
 {
+    public function testAccountLookupsIgnoreCase(): void
+    {
+        $user = $this->createUser('CaseIdentityLookup');
+        $repository = $this->getEntityManager()->getRepository(User::class);
+
+        self::assertSame($user, $repository->loadUserByIdentifier('CASEIDENTITYLOOKUP'));
+        self::assertSame($user, $repository->loadUserByIdentifier('CASEIDENTITYLOOKUP@EXAMPLE.COM'));
+        self::assertSame($user, $repository->findByUsername('caseidentitylookup'));
+        self::assertSame($user, $repository->findOneBy(['email' => 'caseidentitylookup@example.com']));
+        self::assertSame('CaseIdentityLookup', $user->getUserIdentifier());
+        self::assertSame('CaseIdentityLookup@example.com', $user->getEmail());
+    }
+
+    #[DataProvider('getUniqueAccountFields')]
+    public function testAccountUniquenessIgnoresCase(string $field): void
+    {
+        $original = $this->createUser('CaseUnique_' . $field);
+        $email = $original->getEmail();
+        self::assertIsString($email);
+        $duplicate = new User();
+        $duplicate->setUserIdentifier($field === 'username' ? strtolower($original->getUserIdentifier()) : 'DifferentEmailOwner');
+        $duplicate->setEmail($field === 'email' ? strtolower($email) : 'different@example.com');
+        $duplicate->setPassword('foo');
+
+        $validator = self::getContainer()->get('validator');
+        self::assertInstanceOf(ValidatorInterface::class, $validator);
+        $violations = $validator->validate($duplicate);
+        $duplicateFields = [];
+        foreach ($violations as $violation) {
+            if ($violation->getCode() === UniqueEntity::NOT_UNIQUE_ERROR) {
+                $duplicateFields[] = $violation->getPropertyPath();
+            }
+        }
+        self::assertSame([$field], $duplicateFields);
+
+        $this->expectException(UniqueConstraintViolationException::class);
+        $this->getEntityManager()->getRepository(User::class)->saveUser($duplicate);
+    }
+
+    /**
+     * @return array<array<string>>
+     */
+    public static function getUniqueAccountFields(): array
+    {
+        return [['username'], ['email']];
+    }
+
     private function createUser(string $username): User
     {
         $user = new User();

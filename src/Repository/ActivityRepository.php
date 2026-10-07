@@ -159,7 +159,7 @@ class ActivityRepository extends EntityRepository
         $qb->select('a')
             ->from(Activity::class, 'a')
             ->addOrderBy('a.project', 'DESC')
-            ->addOrderBy('a.name', 'ASC')
+            ->addOrderBy('LOWER(a.name)', 'ASC')
         ;
 
         $mainQuery = $qb->expr()->andX();
@@ -258,10 +258,17 @@ class ActivityRepository extends EntityRepository
         foreach ($query->getOrderGroups() as $orderBy => $order) {
             switch ($orderBy) {
                 case 'project':
-                    $orderBy = 'p.name';
+                    $qb->addSelect('CASE WHEN p.name IS NULL THEN 0 ELSE 1 END AS HIDDEN projectOrder');
+                    $qb->addOrderBy('projectOrder', $order);
+                    $orderBy = 'LOWER(p.name)';
                     break;
                 case 'customer':
-                    $orderBy = 'c.name';
+                    $qb->addSelect('CASE WHEN c.name IS NULL THEN 0 ELSE 1 END AS HIDDEN customerOrder');
+                    $qb->addOrderBy('customerOrder', $order);
+                    $orderBy = 'LOWER(c.name)';
+                    break;
+                case 'name':
+                    $orderBy = 'LOWER(a.name)';
                     break;
                 default:
                     $orderBy = 'a.' . $orderBy;

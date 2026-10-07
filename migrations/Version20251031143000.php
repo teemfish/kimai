@@ -24,8 +24,16 @@ final class Version20251031143000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql('CREATE TABLE kimai2_invoice_templates_meta (id INT AUTO_INCREMENT NOT NULL, template_id INT NOT NULL, name VARCHAR(50) NOT NULL, value TEXT DEFAULT NULL, visible TINYINT(1) DEFAULT 0 NOT NULL, INDEX IDX_A165B0555DA0FB8 (template_id), UNIQUE INDEX UNIQ_A165B0555DA0FB85E237E06 (template_id, name), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('ALTER TABLE kimai2_invoice_templates_meta ADD CONSTRAINT FK_A165B0555DA0FB8 FOREIGN KEY (template_id) REFERENCES kimai2_invoice_templates (id) ON DELETE CASCADE');
+        $table = $schema->createTable('kimai2_invoice_templates_meta');
+        $table->addColumn('id', 'integer', ['autoincrement' => true, 'notnull' => true]);
+        $table->addColumn('template_id', 'integer', ['notnull' => true]);
+        $table->addColumn('name', 'string', ['length' => 50, 'notnull' => true]);
+        $table->addColumn('value', 'text', ['length' => 65535, 'notnull' => false, 'default' => null]);
+        $table->addColumn('visible', 'boolean', ['notnull' => true, 'default' => false]);
+        $table->addIndex(['template_id'], 'IDX_A165B0555DA0FB8');
+        $table->addUniqueIndex(['template_id', 'name'], 'UNIQ_A165B0555DA0FB85E237E06');
+        $table->setPrimaryKey(['id']);
+        $schema->getTable('kimai2_invoice_templates_meta')->addForeignKeyConstraint('kimai2_invoice_templates', ['template_id'], ['id'], ['onDelete' => 'CASCADE'], 'FK_A165B0555DA0FB8');
     }
 
     public function down(Schema $schema): void

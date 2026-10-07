@@ -87,12 +87,12 @@ final class SearchHelper
                 } else {
                     $and->add($qb->expr()->eq($alias . '.name', ':' . $paramName));
                     if (!$part->isExcluded()) {
-                        $and->add($qb->expr()->like($field, ':' . $paramValue));
+                        $and->add($qb->expr()->like('LOWER(' . $field . ')', 'LOWER(:' . $paramValue . ')'));
                     } else {
                         $and->add(
                             $qb->expr()->orX()->addMultiple([
                                 $qb->expr()->isNull($field),
-                                $qb->expr()->notLike($field, ':' . $paramValue),
+                                $qb->expr()->notLike('LOWER(' . $field . ')', 'LOWER(:' . $paramValue . ')'),
                             ])
                         );
                     }
@@ -124,12 +124,12 @@ final class SearchHelper
                         $searchAnd->add(
                             $qb->expr()->orX()->addMultiple([
                                 $qb->expr()->isNull($field),
-                                $qb->expr()->notLike($field, ':' . $param),
+                                $qb->expr()->notLike('LOWER(' . $field . ')', 'LOWER(:' . $param . ')'),
                             ])
                         );
                     } else {
                         $or->add(
-                            $qb->expr()->like($field, ':' . $param),
+                            $qb->expr()->like('LOWER(' . $field . ')', 'LOWER(:' . $param . ')'),
                         );
                     }
                     $qb->setParameter($param, '%' . $part->getTerm() . '%');

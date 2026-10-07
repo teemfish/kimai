@@ -30,7 +30,7 @@ final class Version20210802174319 extends AbstractMigration
         $result = $fetch->executeQuery();
 
         foreach ($result->iterateAssociative() as $row) {
-            $this->addSql('UPDATE kimai2_users_teams SET teamlead = 1 WHERE user_id = ? AND team_id = ?', [$row['teamlead_id'], $row['id']]);
+            $this->addSql('UPDATE kimai2_users_teams SET teamlead = TRUE WHERE user_id = ? AND team_id = ?', [$row['teamlead_id'], $row['id']]);
         }
 
         $result->free();
@@ -40,7 +40,7 @@ final class Version20210802174319 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $fetch = $this->connection->prepare('SELECT user_id, team_id, teamlead FROM kimai2_users_teams WHERE teamlead = 1');
+        $fetch = $this->connection->prepare('SELECT user_id, team_id, teamlead FROM kimai2_users_teams WHERE teamlead = TRUE');
         $result = $fetch->executeQuery();
 
         foreach ($result->iterateAssociative() as $row) {

@@ -11,6 +11,7 @@ namespace App\Doctrine;
 
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration as BaseAbstractMigration;
 
@@ -53,7 +54,7 @@ abstract class AbstractMigration extends BaseAbstractMigration
     private function abortIfPlatformNotSupported(): void
     {
         $platform = $this->connection->getDatabasePlatform();
-        if (!($platform instanceof MySQLPlatform)) {
+        if (!($platform instanceof MySQLPlatform) && !($platform instanceof PostgreSQLPlatform)) {
             $this->abortIf(true, 'Unsupported database platform: ' . \get_class($platform));
         }
     }
@@ -61,7 +62,7 @@ abstract class AbstractMigration extends BaseAbstractMigration
     protected function preventEmptyMigrationWarning(bool $always = true): void
     {
         if ($always || \count($this->getSql()) === 0) {
-            $this->addSql('#prevent empty warning - no SQL to execute');
+            $this->addSql('SELECT 1');
         }
     }
 

@@ -9,6 +9,7 @@
 
 namespace App\Doctrine\Extensions;
 
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\ORM\Query\AST\Functions\FunctionNode;
 use Doctrine\ORM\Query\AST\Node;
 use Doctrine\ORM\Query\Parser;
@@ -21,7 +22,13 @@ final class Month extends FunctionNode
 
     public function getSql(SqlWalker $sqlWalker): string
     {
-        return 'MONTH(' . $sqlWalker->walkArithmeticPrimary($this->value) . ')';
+        $value = $sqlWalker->walkArithmeticPrimary($this->value);
+
+        if ($sqlWalker->getConnection()->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+            return 'EXTRACT(MONTH FROM ' . $value . ')';
+        }
+
+        return 'MONTH(' . $value . ')';
     }
 
     public function parse(Parser $parser): void

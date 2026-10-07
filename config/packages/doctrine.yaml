@@ -14,13 +14,16 @@ doctrine:
                 #schema_filter: ~^(?!(bundle_migration_|kimai2_sessions))~
                 url: '%env(DATABASE_URL)%'
                 driver: 'pdo_mysql'
-                charset: utf8mb4
                 default_table_options:
                     charset: utf8mb4
                     collation: utf8mb4_unicode_ci
                 schema_manager_factory: doctrine.dbal.default_schema_manager_factory
+                mapping_types:
+                    citext: case_insensitive_string
 
         types:
+            case_insensitive_string: App\Doctrine\CaseInsensitiveStringType
+            integer: App\Doctrine\IntegerType
             datetime: App\Doctrine\UTCDateTimeType
             datetime_immutable: App\Doctrine\UTCDateTimeImmutableType
     orm:
@@ -37,6 +40,8 @@ doctrine:
                 connection: default
                 naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
                 auto_mapping: true
+                identity_generation_preferences:
+                    Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
                 mappings:
                     App:
                         type: attribute

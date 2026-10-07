@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace DoctrineMigrations;
 
 use App\Doctrine\AbstractMigration;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 
 /**
@@ -26,9 +27,14 @@ final class Version20190201150324 extends AbstractMigration
     {
         $timezone = date_default_timezone_get();
 
-        $this->addSql('ALTER TABLE kimai2_timesheet ADD timezone VARCHAR(64) NOT NULL');
+        $isPostgres = $this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform;
+        $this->addSql('ALTER TABLE kimai2_timesheet ADD timezone VARCHAR(64)' . ($isPostgres ? ' DEFAULT NULL' : ' NOT NULL'));
 
         $this->addSql("UPDATE kimai2_timesheet SET timezone = '" . $timezone . "'");
+
+        if ($isPostgres) {
+            $this->addSql('ALTER TABLE kimai2_timesheet ALTER COLUMN timezone SET NOT NULL');
+        }
     }
 
     public function down(Schema $schema): void

@@ -28,7 +28,12 @@ final class Version20190321181243 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql('CREATE TABLE kimai2_configuration (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(100) NOT NULL, value VARCHAR(255) DEFAULT NULL, UNIQUE INDEX UNIQ_1C5D63D85E237E06 (name), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB');
+        $table = $schema->createTable('kimai2_configuration');
+        $table->addColumn('id', 'integer', ['autoincrement' => true, 'notnull' => true]);
+        $table->addColumn('name', 'string', ['length' => 100, 'notnull' => true]);
+        $table->addColumn('value', 'string', ['length' => 255, 'notnull' => false, 'default' => null]);
+        $table->addUniqueIndex(['name'], 'UNIQ_1C5D63D85E237E06');
+        $table->setPrimaryKey(['id']);
     }
 
     public function down(Schema $schema): void

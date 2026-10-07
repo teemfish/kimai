@@ -4,24 +4,13 @@ KIMAI=$(cat /opt/kimai/version.txt)
 echo $KIMAI
 
 function waitForDB() {
-  # Parse sql connection data
-  DATABASE_USER=$(awk -F '[/:@]' '{print $4}' <<< "$DATABASE_URL")
-  DATABASE_PASS=$(awk -F '[/:@]' '{print $5}' <<< "$DATABASE_URL")
-  DATABASE_HOST=$(awk -F '[/:@]' '{print $6}' <<< "$DATABASE_URL")
-  DATABASE_PORT=$(awk -F '[/:@]' '{print $7}' <<< "$DATABASE_URL")
-  DATABASE_BASE=$(awk -F '[/?]' '{print $4}' <<< "$DATABASE_URL")
-
-  re='^[0-9]+$'
-  if ! [[ $DATABASE_PORT =~ $re ]] ; then
-     DATABASE_PORT=3306
-  fi
-
   echo "Wait for database connection ..."
-  # Credentials are handed over as environment variables of that single command instead of
-  # command line arguments, so they are neither logged nor visible in the process list.
-  until DBTEST_HOST="$DATABASE_HOST" DBTEST_NAME="$DATABASE_BASE" DBTEST_PORT="$DATABASE_PORT" \
-        DBTEST_USER="$DATABASE_USER" DBTEST_PASS="$DATABASE_PASS" php /dbtest.php; do
-    echo Checking DB: $?
+  until DBTEST_URL="$DATABASE_URL" php /dbtest.php; do
+    result=$?
+    if [ "$result" -eq 1 ] || [ "$result" -eq 10 ]; then
+      exit "$result"
+    fi
+    echo "Checking DB: $result"
     sleep 3
   done
   echo "Connection established"

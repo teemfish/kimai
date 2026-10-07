@@ -75,7 +75,8 @@ RUN apk add --no-cache \
     # zip
     libzip-dev \
     # xsl
-    libxslt-dev
+    libxslt-dev \
+    postgresql-dev
 
 # apache debian php extension base
 FROM php:8.3-apache-bookworm AS apache-php-ext-base
@@ -86,7 +87,8 @@ RUN apt-get update && \
         libpng-dev \
         libzip-dev \
         libxslt1-dev \
-        libfreetype6-dev
+        libfreetype6-dev \
+        libpq-dev
 
 # php extension gd - 13.86s
 FROM ${BASE}-php-ext-base AS php-ext-gd
@@ -106,6 +108,10 @@ RUN docker-php-ext-configure ldap && \
 # php extension pdo_mysql : 6.14s
 FROM ${BASE}-php-ext-base AS php-ext-pdo_mysql
 RUN docker-php-ext-install -j$(nproc) pdo_mysql
+
+# php extension pdo_pgsql
+FROM ${BASE}-php-ext-base AS php-ext-pdo_pgsql
+RUN docker-php-ext-install -j$(nproc) pdo_pgsql
 
 # php extension zip : 8.18s
 FROM ${BASE}-php-ext-base AS php-ext-zip
@@ -133,6 +139,7 @@ RUN apk add --no-cache \
         icu \
         icu-data-full \
         libldap \
+        libpq \
         libpng \
         libzip \
         libxslt-dev \
@@ -163,6 +170,7 @@ RUN apt-get update && \
         haveged \
         libicu72 \
         libldap-common \
+        libpq5 \
         libpng16-16 \
         libzip4 \
         libxslt1.1 \
@@ -203,6 +211,9 @@ COPY --from=php-ext-xsl /usr/local/lib/php/extensions/no-debug-non-zts-20230831/
 # PHP extension pdo_mysql
 COPY --from=php-ext-pdo_mysql /usr/local/etc/php/conf.d/docker-php-ext-pdo_mysql.ini /usr/local/etc/php/conf.d/docker-php-ext-pdo_mysql.ini
 COPY --from=php-ext-pdo_mysql /usr/local/lib/php/extensions/no-debug-non-zts-20230831/pdo_mysql.so /usr/local/lib/php/extensions/no-debug-non-zts-20230831/pdo_mysql.so
+# PHP extension pdo_pgsql
+COPY --from=php-ext-pdo_pgsql /usr/local/etc/php/conf.d/docker-php-ext-pdo_pgsql.ini /usr/local/etc/php/conf.d/docker-php-ext-pdo_pgsql.ini
+COPY --from=php-ext-pdo_pgsql /usr/local/lib/php/extensions/no-debug-non-zts-20230831/pdo_pgsql.so /usr/local/lib/php/extensions/no-debug-non-zts-20230831/pdo_pgsql.so
 # PHP extension zip
 COPY --from=php-ext-zip /usr/local/etc/php/conf.d/docker-php-ext-zip.ini /usr/local/etc/php/conf.d/docker-php-ext-zip.ini
 COPY --from=php-ext-zip /usr/local/lib/php/extensions/no-debug-non-zts-20230831/zip.so /usr/local/lib/php/extensions/no-debug-non-zts-20230831/zip.so

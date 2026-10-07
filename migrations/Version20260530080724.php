@@ -10,6 +10,7 @@
 namespace DoctrineMigrations;
 
 use App\Doctrine\AbstractMigration;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Schema\Schema;
 
 /**
@@ -26,7 +27,7 @@ final class Version20260530080724 extends AbstractMigration
     {
         // a security related column
         if (!$schema->getTable('kimai2_users')->hasColumn('signature_date')) {
-            $this->addSql('ALTER TABLE kimai2_users ADD signature_date DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\'');
+            $schema->getTable('kimai2_users')->addColumn('signature_date', 'datetime_immutable', ['notnull' => false]);
         }
 
         // improve session garbage collection
@@ -44,7 +45,11 @@ final class Version20260530080724 extends AbstractMigration
         }
 
         if ($schema->getTable('kimai2_sessions')->hasIndex('lifetime_idx')) {
-            $this->addSql('DROP INDEX lifetime_idx ON kimai2_sessions');
+            if ($this->connection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
+                $this->addSql('DROP INDEX lifetime_idx');
+            } else {
+                $this->addSql('DROP INDEX lifetime_idx ON kimai2_sessions');
+            }
         }
 
         $this->preventEmptyMigrationWarning(false);

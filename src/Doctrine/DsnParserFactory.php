@@ -48,6 +48,10 @@ final class DsnParserFactory
 
         $options = $this->create()->parse($dsn);
 
+        if (!\in_array($options['driver'] ?? null, ['pdo_mysql', 'mysqli'], true)) {
+            return $options;
+        }
+
         $options = array_merge(
             $options,
             [

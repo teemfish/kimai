@@ -93,6 +93,21 @@ class ActivityControllerTest extends APIControllerBaseTestCase
         return [$rate1, $rate2];
     }
 
+    public function testSearchIsCaseInsensitive(): void
+    {
+        $client = $this->getClientForAuthenticatedUser(User::ROLE_USER);
+        $this->loadActivityTestData();
+        $this->assertAccessIsGranted($client, '/api/activities', 'GET', ['term' => 'FIRST ONE']);
+
+        $content = $client->getResponse()->getContent();
+        self::assertIsString($content);
+        $activities = json_decode($content, true);
+        self::assertIsArray($activities);
+        self::assertCount(1, $activities);
+        self::assertIsArray($activities[0]);
+        self::assertSame('first one', $activities[0]['name']);
+    }
+
     public function testIsSecure(): void
     {
         $this->assertUrlIsSecured('/api/activities');

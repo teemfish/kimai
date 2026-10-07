@@ -101,9 +101,9 @@ class SearchHelperTest extends TestCase
         self::assertEquals(':metaName0', $compareParts[0]->getRightExpr());
 
         self::assertInstanceOf(Comparison::class, $compareParts[1]);
-        self::assertEquals('meta0.value', $compareParts[1]->getLeftExpr());
+        self::assertEquals('LOWER(meta0.value)', $compareParts[1]->getLeftExpr());
         self::assertEquals('LIKE', $compareParts[1]->getOperator());
-        self::assertEquals(':metaValue0', $compareParts[1]->getRightExpr());
+        self::assertEquals('LOWER(:metaValue0)', $compareParts[1]->getRightExpr());
 
         // negated search terms
         $where = $whereAnd->getParts()[1];
@@ -114,9 +114,9 @@ class SearchHelperTest extends TestCase
         self::assertEquals('testFoo.bar IS NULL', $compareParts[0]);
 
         self::assertInstanceOf(Comparison::class, $compareParts[1]);
-        self::assertEquals('testFoo.bar', $compareParts[1]->getLeftExpr());
+        self::assertEquals('LOWER(testFoo.bar)', $compareParts[1]->getLeftExpr());
         self::assertEquals('NOT LIKE', $compareParts[1]->getOperator());
-        self::assertEquals(':searchTerm0', $compareParts[1]->getRightExpr());
+        self::assertEquals('LOWER(:searchTerm0)', $compareParts[1]->getRightExpr());
 
         $where = $whereAnd->getParts()[2];
         self::assertInstanceOf(Orx::class, $where);
@@ -126,9 +126,9 @@ class SearchHelperTest extends TestCase
         self::assertEquals('testFoo.tmp IS NULL', $compareParts[0]);
 
         self::assertInstanceOf(Comparison::class, $compareParts[1]);
-        self::assertEquals('testFoo.tmp', $compareParts[1]->getLeftExpr());
+        self::assertEquals('LOWER(testFoo.tmp)', $compareParts[1]->getLeftExpr());
         self::assertEquals('NOT LIKE', $compareParts[1]->getOperator());
-        self::assertEquals(':searchTerm1', $compareParts[1]->getRightExpr());
+        self::assertEquals('LOWER(:searchTerm1)', $compareParts[1]->getRightExpr());
 
         // regular search terms
         $where = $whereAnd->getParts()[3];
@@ -140,14 +140,14 @@ class SearchHelperTest extends TestCase
         self::assertCount(2, $orParts);
 
         self::assertInstanceOf(Comparison::class, $orParts[0]);
-        self::assertEquals('testFoo.bar', $orParts[0]->getLeftExpr());
+        self::assertEquals('LOWER(testFoo.bar)', $orParts[0]->getLeftExpr());
         self::assertEquals('LIKE', $orParts[0]->getOperator());
-        self::assertEquals(':searchTerm2', $orParts[0]->getRightExpr());
+        self::assertEquals('LOWER(:searchTerm2)', $orParts[0]->getRightExpr());
 
         self::assertInstanceOf(Comparison::class, $orParts[1]);
-        self::assertEquals('testFoo.tmp', $orParts[1]->getLeftExpr());
+        self::assertEquals('LOWER(testFoo.tmp)', $orParts[1]->getLeftExpr());
         self::assertEquals('LIKE', $orParts[1]->getOperator());
-        self::assertEquals(':searchTerm3', $orParts[1]->getRightExpr());
+        self::assertEquals('LOWER(:searchTerm3)', $orParts[1]->getRightExpr());
 
         /** @var array<Parameter> $parameters */
         $parameters = $qb->getParameters();
